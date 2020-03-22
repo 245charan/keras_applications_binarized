@@ -411,79 +411,7 @@ def preprocess_input(x, **kwargs):
 Note that the input image format for this model is different than for
 the VGG16 and ResNet models (299x299 instead of 224x224),
 and that the input preprocessing function is also different (same as Xception).
-# Reference
-- [Rethinking the Inception Architecture for Computer Vision](
-    http://arxiv.org/abs/1512.00567) (CVPR 2016)
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import os
-
-from . import get_submodules_from_kwargs
-from . import imagenet_utils
-from .imagenet_utils import decode_predictions
-from .imagenet_utils import _obtain_input_shape
-
-
-WEIGHTS_PATH = (
-    'https://github.com/fchollet/deep-learning-models/'
-    'releases/download/v0.5/'
-    'inception_v3_weights_tf_dim_ordering_tf_kernels.h5')
-WEIGHTS_PATH_NO_TOP = (
-    'https://github.com/fchollet/deep-learning-models/'
-    'releases/download/v0.5/'
-    'inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5')
-
-backend = None
-layers = None
-models = None
-keras_utils = None
-
-
-def conv2d_bn(x,
-              filters,
-              num_row,
-              num_col,
-              padding='same',
-              strides=(1, 1),
-              name=None):
-    """Utility function to apply conv + BN.
-    # Arguments
-        x: input tensor.
-        filters: filters in `Conv2D`.
-        num_row: height of the convolution kernel.
-        num_col: width of the convolution kernel.
-        padding: padding mode in `Conv2D`.
-        strides: strides in `Conv2D`.
-        name: name of the ops; will become `name + '_conv'`
-            for the convolution and `name + '_bn'` for the
-            batch norm layer.
-    # Returns
-        Output tensor after applying `Conv2D` and `BatchNormalization`.
-    """
-    if name is not None:
-        bn_name = name + '_bn'
-        conv_name = name + '_conv'
-    else:
-        bn_name = None
-        conv_name = None
-    if backend.image_data_format() == 'channels_first':
-        bn_axis = 1
-    else:
-        bn_axis = 3
-    x = layers.BinaryConv2D(
-        filters, (num_row, num_col),
-        strides=strides,
-        padding=padding,
-        use_bias=False,
-        name=conv_name)(x)
-    x = layers.BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x)
-    x = layers.Activation('relu', name=name)(x)
-    return x
-
-
 def BinarizedInceptionV3(include_top=True,
                 weights='imagenet',
                 input_tensor=None,
